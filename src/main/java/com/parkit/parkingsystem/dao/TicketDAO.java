@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class TicketDAO {
@@ -86,4 +87,30 @@ public class TicketDAO {
         }
         return false;
     }
+    
+    public int getNbTicket(String vehicleRegNumber) {
+    	Connection con = null;
+    	int nbTicket = 0;
+    	try {
+			con = dataBaseConfig.getConnection();
+			PreparedStatement ps = con.prepareStatement(DBConstants.GET_NBR_TICKET_FROM_VEHICLE);
+			ps.setString(1, vehicleRegNumber);
+			ResultSet rs = ps.executeQuery();
+			if (rs.first()){
+				nbTicket = rs.getInt(1);
+			}
+			
+		} catch (Exception ex) {
+			logger.error("Error get number of Ticket from vehcule " + vehicleRegNumber,ex);
+		}finally {
+			dataBaseConfig.closeConnection(con);
+		}
+		return nbTicket;		
+			
+		
+		}
+    	
+    	
+    	
+    
 }
