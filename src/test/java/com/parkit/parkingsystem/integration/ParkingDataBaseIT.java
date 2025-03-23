@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
@@ -99,7 +100,30 @@ public class ParkingDataBaseIT {
        
     }
     
-    
+    @Test
+    public void testParkingLotExitRecurringUser() throws Exception{
+    	
+    	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+    	for (int i = 0; i < 2; i++) {
+    		parkingService.processIncomingVehicle();
+        	parkingService.processExitingVehicle();
+		}
+    	
+    	assertTrue(ticketDAO.getNbTicket("ABCDEF")>1);
+    	
+    	Ticket ticket = ticketDAO.getTicket("ABCDEF");
+    	//Change the outTime in the database for test the calculateFare function
+        Date outTime = new Date(ticket.getInTime().getTime() + (60*60*1000));
+        ticket.setOutTime(outTime);
+        fareCalculatorService.calculateFare(ticket, ticketDAO.getNbTicket("ABCDEF")>1);
+        ticketDAO.updateTicket(ticket);
+        
+        
+    	
+        assertEquals(Fare.CAR_RATE_PER_HOUR * 0.95, ticketDAO.getTicket("ABCDEF").getPrice());
+    	
+    	
+    }
     
 
 }
