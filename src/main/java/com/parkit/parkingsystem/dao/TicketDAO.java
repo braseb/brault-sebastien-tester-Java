@@ -79,6 +79,7 @@ public class TicketDAO {
             ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
             ps.setInt(3,ticket.getId());
             ps.execute();
+            dataBaseConfig.closePreparedStatement(ps);
             return true;
         }catch (Exception ex){
             logger.error("Error saving ticket info",ex);
@@ -99,7 +100,8 @@ public class TicketDAO {
 			if (rs.first()){
 				nbTicket = rs.getInt(1);
 			}
-			
+			dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
 		} catch (Exception ex) {
 			logger.error("Error get number of Ticket from vehcule " + vehicleRegNumber,ex);
 		}finally {
